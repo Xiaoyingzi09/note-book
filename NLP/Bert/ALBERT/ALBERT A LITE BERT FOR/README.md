@@ -67,7 +67,7 @@ ALBERT 架构的主干类似于 BERT，因为它使用具有 GELU 非线性的�
 
 Dehghani 等人已经探索了类似的策略。  (2018) (Universal Transformer, UT) 和 Bai 等人。  (2019)（深度均衡模型，DQE）用于 Transformer 网络。 与我们的观察不同，Dehghani 等人。  (2018) 表明 UT 的性能优于普通 Transformer。 白等人。 (2019) 表明他们的 DQE 达到了一个平衡点，在这个点上，某个层的输入和输出嵌入保持不变。 我们对 L2 距离和余弦相似度的测量表明我们的嵌入是振荡而不是收敛。
 
-![图1](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/figure%201.png)
+![图1](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/figure%201.png)
 
 图 1：BERT-large 和 ALBERT-large 每一层的输入和输出嵌入的 L2 距离和余弦相似度（就度而言）。
 
@@ -79,7 +79,7 @@ Dehghani 等人已经探索了类似的策略。  (2018) (Universal Transformer,
 
 我们推测 NSP 效率低下的主要原因是与 MLM 相比，它作为一项任务缺乏难度。 按照公式，NSP 将主题预测和连贯性预测合并在一个任务中2。 然而，与一致性预测相比，主题预测更容易学习，并且与使用 MLM 损失学习的内容重叠更多。
 
-![表1](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%201.png)
+![表1](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%201.png)
 
 表 1：本文分析的主要 BERT 和 ALBERT 模型的配置。
 
@@ -133,11 +133,11 @@ Dehghani 等人已经探索了类似的策略。  (2018) (Universal Transformer,
 
 表 3 显示了使用基于 ALBERT 的配置设置（参见表 1），使用相同的一组代表性下游任务更改词汇嵌入大小 E 的效果。 在非共享条件下（BERT 风格），更大的嵌入尺寸会提供更好的性能，但不会太多。 在全共享条件下（ALBERT 风格），大小为 128 的嵌入似乎是最好的。 基于这些结果，我们在未来的所有设置中使用嵌入大小 E = 128，作为进一步扩展的必要步骤。
 
-![表2](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%202.png)
+![表2](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%202.png)
 
 表 2：在 BOOKCORPUS 和 Wikipedia 上预训练 125k 步的模型的开发集结果。在这里和其他地方，Avg 列是通过对其左侧下游任务的分数求平均值来计算的（首先对每个 SQuAD 的 F1 和 EM 两个数字求平均值）。
 
-![表3](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%203.png)
+![表3](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%203.png)
 
 表 3：词汇嵌入大小对 ALBERT-base 性能的影响。
 
@@ -149,7 +149,7 @@ Dehghani 等人已经探索了类似的策略。  (2018) (Universal Transformer,
 
 还有其他跨层共享参数的策略。 例如，我们可以将 L 层分成 N 个大小为 M 的组，每个大小为 M 的组共享参数。 总的来说，我们的实验结果表明，组大小 M 越小，我们获得的性能就越好。 然而，减小组大小 M 也会显着增加整体参数的数量。 我们选择全共享策略作为我们的默认选择。
 
-![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%204.png)
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%204.png)
 
 表 4：跨层参数共享策略的影响，ALBERT-base 配置。
 
@@ -157,7 +157,7 @@ Dehghani 等人已经探索了类似的策略。  (2018) (Universal Transformer,
 
 我们使用 ALBERTbase 配置直接比较了三个额外的句间损失的实验条件：无（XLNet 和 RoBERTa 风格）、NSP（BERT 风格）和 SOP（ALBERT 风格）。 结果如表 5 所示，包括内在（MLM、NSP 和 SOP 任务的准确性）和下游任务。
 
-![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%205.png)
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%205.png)
 
 表 5：句子预测损失、NSP 与 SOP 对内在和下游任务的影响。
 
@@ -168,7 +168,7 @@ Dehghani 等人已经探索了类似的策略。  (2018) (Universal Transformer,
 
 表 2 中的加速结果表明，BERT-large 的数据吞吐量比 ALBERT-xxlarge 高约 3.17 倍。 由于更长的训练通常会带来更好的性能，因此我们进行了比较，其中不控制数据吞吐量（训练步数），而是控制实际训练时间（即，让模型训练相同的小时数）  . 在表 6 中，我们比较了 BERT-large 模型在 400k 训练步骤（训练 34 小时后）后的性能，大致相当于使用 125k 训练步骤（32 小时训练）训练 ALBERT-xxlarge 模型所需的时间。
 
-![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%206.png)
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%206.png)
 
 表 6：控制训练时间的效果，BERT-large 与 ALBERT-xxlarge 配置。
 
@@ -179,17 +179,17 @@ Dehghani 等人已经探索了类似的策略。  (2018) (Universal Transformer,
 到目前为止完成的实验仅使用 Wikipedia 和 BOOKCORPUS 数据集，如 (Devlin et al., 2019)。 在本节中，我们报告了对 XLNet（Yang 等人，2019）和 RoBERTa（Liu 等人，2019 年）使用的附加数据的影响的测量结果。
 图 2a 绘制了在没有和有附加数据的两种条件下开发集 MLM 准确度，后一种条件显着提高。 我们还在表 7 中观察到下游任务的性能改进，除了 SQuAD 基准测试（基于维基百科，因此受到域外训练材料的负面影响）。
 
-![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%207.png)
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%207.png)
 
 表 7：使用 ALBERT-base 配置的额外训练数据的效果。
 
 我们还注意到，即使经过 100 万步的训练，我们最大的模型仍然不会过度拟合它们的训练数据。 因此，我们决定移除 dropout 以进一步增加我们的模型容量。图 2b 中的图显示去除 dropout 显着提高了 MLM 精度。 在大约 100 万个训练步骤（表 8）上对 ALBERT-xxlarge 的中间评估也证实了去除 dropout 有助于下游任务。 有经验（Szegedy 等人，2017）和理论（Li 等人，2019 年）证据表明，卷积神经网络中批量归一化和 dropout 的组合可能会产生有害结果。 据我们所知，我们是第一个证明 dropout 会损害基于 Transformer 的大型模型的性能的人。 但是，ALBERT 的底层网络结构是transformer 的一个特例，需要进一步的实验，看看其他基于transformer 的架构是否会出现这种现象。
 
-![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/figure%202.png)
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/figure%202.png)
 
 图 2：在训练过程中添加数据和去除 dropout 的效果。
 
-![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%208.png)
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%208.png)
 
 表 8：针对 ALBERT-xxlarge 配置测量的删除 dropout 的效果。
 
@@ -197,7 +197,7 @@ Dehghani 等人已经探索了类似的策略。  (2018) (Universal Transformer,
 
 我们在本节中报告的结果利用了 Devlin 等人使用的训练数据。  (2019)，以及 Liu 等人使用的额外数据。  (2019) 和 Yang 等人。  (2019)。 我们在两种微调设置下报告了最先进的结果：单模型和集成。 在这两种设置中，我们只进行单任务微调4。 继刘等人。  (2019)，在开发集上，我们报告了五次运行的中值结果。
 
-![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%209.png)
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%209.png)
 
 表 9：GLUE 基准测试的最新结果。 对于单任务单模型结果，我们以 100 万步（与 RoBERTa 相当）和 150 万步报告 ALBERT。  ALBERT 集成使用经过 1M、1.5M 和其他步数训练的模型。
 
@@ -207,7 +207,7 @@ Dehghani 等人已经探索了类似的策略。  (2018) (Universal Transformer,
 
 单模型和集成结果都表明 ALBERT 显着提高了所有三个基准的最新技术水平，实现了 89.4 的 GLUE 分数、92.2 的 SQuAD 2.0 测试 F1 分数和 89.4 的 RACE 测试准确率。 后者似乎是一个特别强劲的改进，比 BERT（Devlin 等人，2019 年；Clark 等人，2019 年）高 17.4%，比 XLNet（Yang 等人，2019 年）高 7.6%， 比 RoBERTa (Liu et al., 2019) 高 6.2%，比 DCMI+ (Zhang et al., 2019) 高 5.3%，后者是专为阅读理解任务设计的多个模型的集合。我们的单一模型达到了 86.5% 的准确率，仍然比最先进的集成模型高 2.4%。
 
-![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NoteBook/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%2010png.png)
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Bert/ALBERT/ALBERT%20A%20LITE%20BERT%20FOR/table%2010png.png)
 
 表 10：SQuAD 和 RACE 基准的最新结果。
 
