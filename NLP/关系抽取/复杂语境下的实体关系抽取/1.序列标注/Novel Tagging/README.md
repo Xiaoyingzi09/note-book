@@ -12,7 +12,7 @@
 
 传统方法以流水线方式处理此任务，即首先提取实体（Nadeau 和 Sekine，2007），然后识别它们的关系（Rink，2010）。 这种分离的框架使任务易于处理，每个组件都可以更加灵活。 但是它忽略了这两个子任务之间的相关性，每个子任务都是一个独立的模型。 实体识别的结果可能会影响关系分类的性能并导致错误传递（Li and Ji, 2014）。
 
-![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/1.%E5%BA%8F%E5%88%97%E6%A0%87%E6%B3%A8/Novel%20Tagging/Figure/figure%201.png)
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/1.%E5%BA%8F%E5%88%97%E6%A0%87%E6%B3%A8/Novel%20Tagging/Figure/figure_1.png)
 
 图 1：任务的标准例句。  “国家主席”是预定义关系集中的关系。
 
@@ -44,19 +44,41 @@
 
 #### 3.1、The Tagging Scheme（标注方案）
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/1.%E5%BA%8F%E5%88%97%E6%A0%87%E6%B3%A8/Novel%20Tagging/Figure/figure_2.png)
 
+图二： “CP”是“Country-President”的简称，“CF”是“Company-Founder”的简称，是一个基于我们标注方案的例句的标准黄金标注方案。
 
+图2是标注结果的示例。每个单词都被分配一个标签，用于提取结果。**标签“O”代表“Other”标签**，这意味着相应的单词与提取结果无关。除了“O”之外，其他标签由**三部分组成**：**实体中的单词位置**、**关系类型**和**关系角色**。我们**使用“BIES”（Begin, Inside, End, Single）符号来表示单词在实体中的位置信息**。**关系类型信息是从一组预定义的关系中获得的**，**关系角色信息由数字“1”和“2”表示**。提取的结果由三元组表示：（Entity1，RelationType，Entity2）。“1”表示该词属于三元组中的第一个实体，而“2”则属于该关系类型后面的第二个实体。因此，标签总数为Nt = 2 * 4 * | R | + 1，其中| R |是预定义的关系集的大小。
 
+图2是一个说明我们的标注方法的例子。输入句子包含两个三元组：{United States, Country-President, Trump}和{Apple Inc, Company-Founder, Steven Paul Jobs}，其中“Country-President”和“Company-Founder”是预定义的关系类型。United”,“States”,“Trump”,“Apple”,“Inc” ,“Steven”, “Paul”和“Jobs”等词都与最终提取的结果有关。因此，他们根据我们的特殊标签进行标注。例如“United”这个词是“United States”实体的第一个词，与“Country-President”关系有关，所以它的标签是“B-CP-1”。对应于“United States”的另一个实体“Trump”被标记为“S-CP-2”。此外，与最终结果无关的其他字词标记为“O”。
 
+#### 3.2、From Tag Sequence To Extracted Results（从标记序列到提取结果）
 
+根据图2中的标注序列，我们知道“Trump”和“United States”具有相同的关系类型“Country-President”，“Apple Inc”和“Steven Paul Jobs”具有相同的关系类型“Company-Founder”。我们**将具有相同关系类型的实体合并为一个三元组来获得最终结果**。因此，“Trump”和“United States”可以合并为关系类型为“Country-President”的三联体。因为，“Trump”的关系角色是“2”，“United States”是“1”，最终的结果是{United States, CountryPresident, Trump}。这同样适用于{Apple Inc, Company-Founder, Steven Paul Jobs}。
 
+此外，**如果一个句子包含两个或更多具有相同关系类型的三元组，我们将每两个元素按照最接近的原则组合成一个三元组**。例如，如果图2中的关系类型“Country-President”是“Country-President”，则在给定句子中将有四个具有相同关系类型的实体。 “United States”最接近实体“Trump”，而“Apple Inc”最接近“Jobs”，因此结果将是{United States, Company-Founder, Trump}和{Apple Inc, Company-Founder, Steven Paul Jobs}。
 
+在本文中，我们只考虑**一个实体属于一个三元组**的情况，并且在将来的工作中考虑重叠关系的识别。
 
+#### 3.3、The End-to-end Model（端到端模型）
 
+近年来，基于神经网络的端到端模型在序列标注任务中得到了广泛的应用。在本文中，我们采用了一个端到端的模型来生成标注序列，如图3所示。它包含双向长短期记忆（Bi-LSTM）层来对输入句子和具有偏置损失的基于LSTM的解码层进行编码。**偏置损失可以增强实体标签的相关性**。
 
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/1.%E5%BA%8F%E5%88%97%E6%A0%87%E6%B3%A8/Novel%20Tagging/Figure/figure_3.png)
 
+图三：我们的模型图。 （a）**端到端模型的体系结构**，（b）**Bi-LSTM编码层中的LSTM记忆块**，（c）**LSTMd解码层中的LSTM记忆块**。
 
+**（1）Bi-LSTM编码层**
+**在序列标注问题中，Bi-LSTM编码层已被证明有效捕获每个单词的语义信息**。它包含前向Lstm层，后向Lstm层和连接层。**词嵌入层将one-hot表示的单词转换为嵌入向量**。因此，一个单词序列可以表示为W = {w1，… wt，wt+1 … wn}，其中wt∈Rd是对应于句中第t个单词的d维词向量，n是给定句子的长度。在词嵌入层之后，有两个平行的LSTM层：前向LSTM层和后向LSTM层。 LSTM体系结构由一组递归连接的子网（称为记忆块）组成。每个时间步是一个LSTM记忆块。 Bi-LSTM编码层中的LSTM记忆块用于根据前一个隐藏向量ht-1、前一个单元向量ct-1和当前输入词表示wt计算当前隐藏向量ht。其结构图如图3（b）所示，具体操作定义如下：
+
+<img src="https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/1.%E5%BA%8F%E5%88%97%E6%A0%87%E6%B3%A8/Novel%20Tagging/Figure/formula_1.png" style="zoom:50%;" />
+
+其中i，f和o分别是输入门、忘记门和输出门，b是偏置项，c是记忆元，W(.)是参数。对于每个词wt，前向LSTM层将通过考虑从词w1到wt的上下文信息（其被标记为ht(→)）来编码wt。类似地，后向LSTM层将基于从wn到wt的上下文信息来编码wt，其被标记为ht(←)。最后，我们连接和来表示字t的编码信息，表示为ht=[ht(→),ht(←)]。
+
+**（2）LSTM解码器层**
+我们也**采用LSTM结构来生成标注序列**。当检测到单词wt的标注时，解码层的输入为：从Bi-LSTM编码层获得的ht，以前的预测标签表示Tt-1，以前的单元值：ct-1，以及解码层中的前一个隐藏向量ht-1。图3（c）显示了LSTMd记忆块的结构图，具体操作定义如下：
+
+<img src="https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/1.%E5%BA%8F%E5%88%97%E6%A0%87%E6%B3%A8/Novel%20Tagging/Figure/formula_2.png" style="zoom:50%;" />
 
 
 
