@@ -21,12 +21,31 @@
   - 将js代码编写到页面的下部就是为了，可以在页面加载完毕以后再执行js代码
 
 - DOM查询
-  - document.getElementById()
-  - document.getElementsByTagName()：可以根据标签名来获取一组元素节点对象。这个方法会给我们返回一个类数组对象，所有查询到的元素都会封装到对象中。即使查询到的元素只有一个，也会封装到数组中返回。
-  - innerHTML 通过这个属性可以获取到元素内部的html代码，对于自结束标签，这个属性没有意义
+  - *document*（获取元素节点，在整个页面查询）
+    - *document.getElementById()*
+      - 通过id属性获取一个元素节点对象
+    - *document.getElementByTagName()*
+      - 通过标签名获取一组元素节点对象
+      - *childNodes*，表示当前节点的**所有子节点**
+        - *childNodes*属性会获取包括文本节点在呢的所有节点，根据DOM标签标签间空白也会当成文本节点；在IE8及以下的浏览器中，不会将空白文本当成子节点
+        - *children*属性可以获取当前元素的所有**子元素**
+      - *firstChild*，表示当前节点的第一个子节点
+        - *firstChild*可以获取到当前元素的**第一个子节点（包括空白文本节点）**
+        - *firstElementChild*获取当前元素的**第一个子元素**：*firstElementChild*不支持IE8及以下的浏览器，如果需要兼容他们尽量不要使用
+      - *lastChild*，表示当前节点的**最后一个子节点**
+      - 获取父节点和兄弟节点
+        - *parentNode*：表示当前节点的父节点
+        - *previousSibling*：表示当前节点的前一个兄弟节点，也可能获取到空白的文本。*previousElementSibling*获取前一个兄弟元素，IE8及以下不支持
+        - *nextSibling*：表示当前节点的后一个兄弟节点
+    - *document.getElementByName()*
+      - 通过name属性获取一组元素节点对象
+  - *document.getElementsByTagName*()：可以根据标签名来获取一组元素节点对象。这个方法会给我们返回一个类数组对象，所有查询到的元素都会封装到对象中。即使查询到的元素只有一个，也会封装到数组中返回。
+  - *innerHTML* 通过这个属性可以获取到元素内部的*html*代码，对于自结束标签，这个属性没有意义
+  - *innerText* 该属性可以获取到元素内部的文本内容，它和*innerHTML*类似，不同的是它会自动将*html*去除
   - 如果需要读取元素节点属性，
     - 直接使用 元素.属性名
     - 例子：元素.id 元素.name 元素.value
       注意：class属性不能采用这种方式，
-      读取class属性时需要使用 元素.className
+      读取class属性时需要使用 元素.*className*
+  - 在事件的响应函数中，响应函数是给谁绑定的this就是谁
 
