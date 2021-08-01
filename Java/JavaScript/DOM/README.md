@@ -20,6 +20,11 @@
     - 该事件对应的响应函数将会在页面加载完成之后执行，这样可以确保我们的代码执行时所有的DOM对象已经加载完毕了
   - 将js代码编写到页面的下部就是为了，可以在页面加载完毕以后再执行js代码
 
+
+
+
+## DOM查询
+
 - DOM查询
   - *document*（获取元素节点，在整个页面查询）
     - *document.getElementById()*
@@ -48,4 +53,47 @@
       注意：class属性不能采用这种方式，
       读取class属性时需要使用 元素.*className*
   - 在事件的响应函数中，响应函数是给谁绑定的this就是谁
+  - DOM查询的其他方法
+    - 获取body标签//*var* *body* = *document.getElementsByTagName*("*body*")[0],在document中有一个属性body，它保存的是body的引用
+    - *document.documentElement*保存的是html根标签
+    - *document.all*代表页面中所有的元素
+    - 根据元素的class属性值查询一组元素节点对象
+    -  *getElementsByClassName*()可以根据class属性值获取一组元素节点对象，但是该方法不支持IE8及以下的浏览器
+    - 获取页面中的所有的div://*var* *divs* = *document.getElementsByTagName*("div")
+    - *document.querySelector*()
+      - 需要一个选择器的字符串作为参数，可以根据一个CSS选择器来查询一个元素节点对象
+      - 虽然IE8中没有*getElementsByClassName*()但是可以使用*querySelector*()代替
+      - 使用该方法总会返回唯一的一个元素，如果满足条件的元素有多个，那么它只会返回第一个
+      - *document.querySelectorAll*()
+        - 该方法和*querySelector*()用法类似，不同的是它会将符合条件的元素封装到一个数组中返回
+        -  即使符合条件的元素只有一个，它也会返回数组
+
+
+
+## DOM增删改
+
+- DOM增
+  - document.createElement()：可以用于创建一个元素节点对象，它需要一个标签名作为参数，将会根据该标签名创建元素节点对象，并将创建好的对象作为返回值返回。
+  - document.createTextNode()：可以用来创建一个文本节点对象，需要一个文本内容作为参数，将会根据该内容创建文本节点，并将新的节点返回。
+  - appendChild()：向一个父节点中添加一个新的子节点，用法：父节点.appendChild(子节点)
+  - insertBefore()：可以在指定的子节点前插入新的子节点。语法：父节点.insertBefore(新节点,旧节点)
+  - replaceChild()：可以使用指定的子节点替换已有的子节点。 语法：父节点.replaceChild(新节点,旧节点)
+  - 使用innerHTML也可以完成DOM的增删改的相关操作，一般我们会两种方式结合使用：创建一个li，向li中设置文本
+- DOM删
+  - removeChild()： 可以删除一个子节点。语法：父节点.removeChild(子节点)；常用：子节点.parentNode.removeChild(子节点)；
+  - 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
