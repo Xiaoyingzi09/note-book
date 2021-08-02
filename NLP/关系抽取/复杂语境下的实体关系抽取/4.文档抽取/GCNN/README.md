@@ -12,7 +12,9 @@
 
 句间关系不仅依赖于本地依赖，也依赖于非本地依赖。在句内关系提取 (RE) 中，依赖树通常用于提取语义关系的局部依赖关系 (Culotta and Sorensen, 2004; Liu et al., 2015)。 然而，这种依赖对于句间 RE 是不够的，因为不同的句子有不同的依赖树。 图 1 说明了催产素和低血压之间的这种情况。 为了捕捉它们的关系，必须将共同引用的实体 Oxytocin 和 Oxt 联系起来。RNN 和 CNN，常用于句内 RE（Zeng 等，2014；dos Santos 等，2015；Zhou 等，2016b；Lin 等，2016）对较长的序列无效 （Sahu 和 Anand，2018）因此未能捕获此类非本地依赖项。
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/GCNN/figure/figure_1.png)
+
+图 1：命名实体之间具有非本地依赖关系的句子。红色箭头表示共同引用实体之间的关系，黄色箭头表示语义依赖关系。 改编自 CDR 数据集的示例（Wei 等，2015）。
 
 我们提出了一种新颖的句间 RE 模型，该模型在文档级图上构建了一个带标签的边缘图 CNN (GCNN) 模型（Marcheggiani 和 Titov，2017 年）。图节点对应单词，边表示它们之间的局部和非局部依赖性。 文档级图是通过将单词与来自句法解析和顺序信息的局部依赖以及来自共指解析和其他语义依赖的非局部依赖连接起来形成的 (Peng et al., 2017)。我们使用基于 MIL 的双仿射成对评分函数 (Verga et al., 2018) 在实体节点表示上推断实体之间的关系。
 
@@ -24,7 +26,9 @@
 
 我们在图 2 中描述了我们提出的模型的架构。该模型将科学文章的完整摘要和两个目标实体作为输入，并在输入层中提及它们。然后构建一个图结构，以单词为节点，标记边对应局部和非局部依赖。 接下来，它使用堆叠的 GCNN 层对图结构进行编码，并通过应用 MIL (Verga et al., 2018) 来聚合所有提及对表示来对目标实体之间的关系进行分类。
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/GCNN/figure/figure_2.png)
+
+图 2：提议的模型架构。 输入的词序列被映射到一个图结构，其中节点是词，边对应于依赖关系。 为简洁起见，我们省略了几个边，例如所有单词的自节点边和不同标签的句法依赖边。  GCNN 用于对图进行编码，双仿射层聚合所有提及对。
 
 #### 2.1 输入层
 
@@ -48,7 +52,7 @@
 
 我们通过在构建的文档图上应用 GCNN（Kipf 和 Welling，2017 年；Defferrard 等人，2016 年）来计算每个输入词 i 的表示。  GCNN 是用于图编码的 CNN 的高级版本，它学习图节点的语义表示，同时保留其结构信息。为了学习特定于边缘类型的表示，我们使用标记的边缘 GCNN，它为每种边缘类型保留单独的参数（Vashishth 等，2018）。GCNN 迭代更新每个输入词 i 的表示如下：
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/GCNN/figure/formula_1.png)
 
 其中 xk+1 i 是第 k 个 GCNN 块产生的第 i 个单词表示，ν(i) 是 i 的一组相邻节点，Wk l(i,u) 和 bk l(i,u) 是 节点 i 和 u 之间边类型 l 的第 k 个块的参数。 我们堆叠 K GCNN 块以积累来自远处相邻节点的信息，并使用边缘门控来控制来自相邻节点的信息。
 
@@ -58,13 +62,13 @@
 
 由于每个目标实体在一个文档中可以有多个提及，我们采用基于多实例学习 (MIL) 的分类方案来使用双仿射成对评分聚合所有目标提及对的预测 (Verga et al., 2018)。如图 2 所示，首先使用两层前馈神经网络 (FFNN) 将每个单词 i 投影到两个单独的潜在空间中，这对应于目标对的第一个（头部）或第二个（尾部）参数。
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/GCNN/figure/formula_2.png)
 
 其中 xK i 对应于 |K| 之后的第 i 个单词的表示 GCNN 编码块，W(0), W(1) 分别是头和尾的两个 FFNN 的参数，xhead i , xtail i ∈ Rd 是第 i 个词的头/尾表示。
 
 然后，提及级别的成对置信度分数由双仿射层生成并聚合以获得实体级别的成对分数。
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/GCNN/figure/formula_3.png)
 
 其中，R ∈ Rd×r×d 是一个学习的双仿射张量，r 是关系类别的数量，Ehead、Etail 分别表示实体 ehead 和 etail 的一组提及。
 
@@ -80,7 +84,9 @@
 
 化学反应数据集 (CHR)：我们使用远程监督创建了一个文档级数据集，其中包含化学品之间的关系。 首先，我们使用语义分面搜索引擎 Thalia2 (Soto et al., 2018) 的后端从 PubMed 获取用几个生物医学命名实体注释的摘要。 我们从带注释的实体中选择化合物，并将它们与图数据库 Biochem4j（Swainston 等，2017）对齐。  Biochem4j 是一个免费提供的数据库，它集成了 UniProt、KEGG 和 NCBI Taxonomy3 等多种资源。如果两个化学实体在 Biochem4j 中有关系，我们将它们视为数据集中的正实例，否则视为负实例。
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/GCNN/figure/table_1.png)
+
+表 1：CDR 和 CHR 数据集的统计数据。
 
 #### 3.2 数据预处理
 
@@ -102,9 +108,17 @@
 
 图 3 说明了我们的模型在使用不同数量的最常见边缘类型 N 时在 CDR 开发集上的性能。在调整 N 时，我们观察到 top-4 边缘类型获得了最佳性能，但性能稍有下降。 我们在其他实验中选择了 top-4 边缘类型。
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/GCNN/figure/table_2.png)
 
-![]()
+表 2：与最先进技术相比，CDR 和 CHR 测试集的性能。
+
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/GCNN/figure/figure_3.png)
+
+图 3：GCNN 模型在 CDR 开发集上的性能，当使用 top-N 最常见的边缘类型并将其余的视为单个“稀有”类型时。
+
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/GCNN/figure/table_3.png)
+
+表 3：对 CDR 开发集的消融分析，以 F1 分数 (%) 表示，用于句内 (Intra) 和句间 (Inter) 对。
 
 我们通过将开发集分离为句内和句间对（分别约为 70% 和 30%）对 CDR 数据集进行消融分析。表 3 显示了一次删除一个边缘类别时的性能。 总的来说，所有依赖类型对句间 RE 和整体性能都有积极影响，尽管自节点和相邻句子边缘对句内关系的性能略有损害。 此外，共指不影响句内对。
 
