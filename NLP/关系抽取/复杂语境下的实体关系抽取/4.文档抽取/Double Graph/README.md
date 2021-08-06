@@ -136,13 +136,111 @@ GCN的不同层表达不同抽象层次的特征，因此为了覆盖所有层�
 
 ## 4 实验
 
+#### 4.1 数据集
 
+我们在 DocRED (Yao et al., 2019) 上评估我们的模型，DocRED 是从维基百科和维基数据构建的用于文档级 RE 的大规模人工注释数据集。  DocRED 共有 96 种关系类型，132、275 个实体和 56、354 个关系事实。  DocRED 中的文档平均包含约 8 个句子，40.7% 以上的关系事实只能从多个句子中提取。此外，61.1% 的关系实例需要各种推理技能，例如逻辑推理（Yao 等，2019）。 我们遵循数据集的标准拆分，3, 053 个文档用于训练，1, 000 个用于开发，1, 000 个用于测试。 有关 DocRED 的更详细统计数据，我们建议读者参考原始论文（Yao 等，2019）。
+
+#### 4.2 实验设置
+
+在我们的 GAIN 实现中，我们使用了 2 层 GCN，并将丢弃率设置为 0.6，学习率设置为 0.001。 我们使用 AdamW（Loshchilov 和 Hutter，2019）作为权重衰减为 0.0001 的优化器训练 GAIN，并在 PyTorch（Paszke 等，2017）和 DGL（Wang 等，2019b）下实现 GAIN。
+
+我们为 GAIN 实现了三个设置。GAIN-GloVe 使用 GloVe (100d) 和 BiLSTM (256d) 作为词嵌入和编码器。  GAINBERTbase 和 GAIN-BERTlarge 分别使用 BERTbase 和 BERTlarge 作为编码器，学习率设置为 1e−5。
+
+#### 4.3 Baseline和评估矩阵
+
+我们使用以下模型作为基线。
+
+姚等人。  (2019) 提出的模型使用 CNN（Fukushima，1980）、LSTM（Hochreiter 和 Schmidhuber，1997）和 BiLSTM（Schuster 和 Paliwal，1997）作为它们将文档编码为隐藏状态向量序列 {hi}ni=1 编码器，并用它们的表示预测实体之间的关系。 其他预训练模型，如 BERT (Devlin et al., 2019)、RoBERTa (Liu et al., 2019) 和 CorefBERT (Ye et al., 2020) 也用作编码器 (Wang et al., 2019a; Ye  et al., 2020) 到文档级 RE 任务。
+
+上下文感知，也由 Yao 等人提出。 (2019) on DocRED 改编自 (Sorokin and Gurevych, 2017)，使用 LSTM 对文本进行编码，但进一步利用注意力机制吸收上下文关系信息进行预测。
+
+BERT-Two-Stepbase，由 Wang 等人提出。(2019a) 在 DocRED 上。 虽然类似于BERTREbase，但它首先预测两个实体是否有关系，然后预测具体的目标关系。
+
+Tang 等人提出的 HIN-GloVe/HIN-BERTbase。  (2020)。分层推理网络 (HIN) 聚合来自实体级、句子级和文档级的信息以预测目标关系，并使用 GloVe (Pennington et al., 2014) 或 BERTbase 进行词嵌入。
+
+LSR-GloVe/LSR-BERTbase，由 Nan 等人提出。  (2020) 最近。 他们基于依赖树构建图，并通过潜在结构归纳和 GCN 预测关系。 南等人。  (2020) 还将四种基于图的最先进的 RE 模型应用于 DocRED，包括 GAT (Velickovic et al., 2017)、GCNN (Sahu et al., 2019)、EoG (Christopoulou et al., 2019)  ) 和 AGGCN (Guo et al., 2019)。 我们还包括他们的结果。
+
+继姚等人。  (2019)，我们在实验中使用了广泛使用的指标 F1 和 AUC。 我们还使用 Ign F1 和 Ign AUC，它们计算 F1 和 AUC，不包括训练和开发/测试集中的共同关系事实。
+
+#### 4.4 结果
+
+与其他基线相比，我们在表 2 中的 DocRED 数据集上展示了 GAIN 的性能。
+
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/b35d161a9a6df59dc34edc8b878522fbea77f5f2/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/Double%20Graph/figure/table_2.png)
+
+表 2：DocRED 上的性能。 第一双线以上的模型不使用预训练模型。 带 * 的结果报告在他们的原始论文中。  ‡ 的结果是 (Nan et al., 2020) 中实现的基于图的最先进 RE 模型的性能。 带有 † 的结果基于我们的实施。
+
+在不使用 BERT 或 BERT 变体的模型中，GAIN-GloVe 在测试集上始终优于所有基于序列和基于图的强基线 0.9 ∼ 12.82 F1 分数。 在使用 BERT 或 BERT 变体的模型中，与强基线 LSR-BERTbase 相比，GAINBERTbase 在开发和测试集上的 F1/Ign F1 分别提高了 2.22/6.71 和 2.19/2.03。 与之前最先进的方法 CorefRoBERTaRElarge 相比，GAIN-BERTlarge 还在测试集上提高了 2.85/2.63 F1/Ign F1。 这表明 GAIN 在文档级 RE 任务中更有效。 我们还可以观察到，LSR-BERTbase 在开发和测试集上将 F1 提高了 3.83 和 4.87，其中 GloVe 嵌入替换为 BERTbase。 相比之下，我们的 GAINBERTbase 提高了 5.93 和 6.16，这表明 GAIN 可以更好地利用 BERT 表示。
+
+#### 4.5 消融研究
+
+为了进一步分析 GAIN，我们还进行了消融研究，以说明 GAIN 中不同模块和机制的有效性。 我们在表 3 中显示了消融研究的结果。
+
+首先，我们移除 GAIN 的异构 Mentionlevel Graph (hMG)。 详细地，我们使用方程初始化实体级图（EG）中的实体节点。  5 但将 mn 替换为 h(0) n ，并将 GCN 应用于 EG。 将 GCN 不同层中的特征连接起来以获得 ei。 在没有 hMG 的情况下，GAIN-GloVe/GAIN-BERTbase 的性能在开发集上急剧下降了 2.08/2.02 Ign F1 分数。 这一下降表明 hMG 在捕获属于相同和不同实体和文档感知特征的提及之间的交互方面起着至关重要的作用。
+
+接下来，我们移除推理模块。 具体来说，该模型摒弃了Entitylevel Graph中得到的头尾实体ph,t之间的路径信息，仅基于实体表示eh和et和文档节点表示mdoc预测关系。 推理模块的移除导致所有指标的性能不佳，例如，GAIN-GloVe/GAIN-BERTbase 的开发集上的 Ign F1 分数降低了 2.21/2.17。这表明我们的路径推理机制有助于捕获潜在的 K 跳推理路径以推断关系，从而提高文档级 RE 性能。
+
+此外，去掉 hMG 中的文档节点会导致 GAIN-GloVe/GAIN-BERTbase 的开发集上的 Ign F1 减少 2.19/1.88。 它帮助 GAIN 聚合文档信息，并作为一个枢轴来促进不同提及之间的信息交换，尤其是文档中相距较远的那些。
+
+#### 4.6 分析和讨论
+
+在本小节中，我们将进一步分析开发集上的句间和推理性能。 与 Nan 等人相同。  (2020)，我们在表 4 中报告了 Intra-F1/Inter-F1 分数，它们分别只考虑了句内或句间关系。 同样，为了评估模型的推理能力，表 5 报告了 Infer-F1 分数，该分数仅考虑参与关系推理过程的关系。 例如，我们在计算 Infer-F1 时考虑黄金关系事实 r1、r2 和 r3，如果存在 eh r1 −→ eo r2 −→ et 和 eh r3 −→ et。
+
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/b35d161a9a6df59dc34edc8b878522fbea77f5f2/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/Double%20Graph/figure/table_3.png)
+
+表 3：具有不同嵌入和子模块的 GAIN 性能。
+
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/b35d161a9a6df59dc34edc8b878522fbea77f5f2/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/Double%20Graph/figure/table_4.png)
+
+表 4：在 DocRED 开发集上的 Intra-F1 和 Inter-F1 结果。 带 * 的结果报告在 (Nan et al., 2020) 中。
+
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/b35d161a9a6df59dc34edc8b878522fbea77f5f2/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/Double%20Graph/figure/table_5.png)
+
+表 5：在 DocRED 开发集上的 Infer-F1 结果。  P：精度，R：召回。
+
+如表 4 所示，GAIN 不仅在 Intra-F1 中而且在 Inter-F1 中都优于其他基线，并且去除 hMG 导致 Inter-F1 比 Intra-F1 下降更显着，这表明我们的 hMG 确实有助于提及之间的交互 ，尤其是分布在不同句子中的远距离依赖。
+
+此外，表 5 表明 GAIN 可以更好地处理关系推理。例如，与 RoBERTa-REbase 相比，GAINBERTbase 改进了 5.11 Infer-F1。推理模块在捕获实体之间的潜在推理链方面也发挥着重要作用，否则 GAINBERTbase 将下降 1.78 Infer-F1。
+
+#### 4.7 案例分析
+
+图 3 还显示了我们提出的模型 GAIN 与其他基线相比的案例研究。如图所示，BiLSTM 只能识别第一句话中的两个关系。  BERT-REbase 和 GAIN-BERTbase 都可以成功预测《Without Me》是 The Eminem Show 的一部分。 但只有 GAIN-BERTbase 能够推断出《Without Me》的表演者和出版日期与 The Eminem Show 相同，即 Eminem 和 2002 年 5 月 26 日，需要跨句子进行逻辑推理。
 
 ## 5 相关工作
 
+以前的方法侧重于句子级关系提取（Zeng et al., 2014; Zeng et al., 2015; Wang et al., 2016; Zhou et al., 2016; Xiao and Liu, 2016; Zhang et al., 2017  ；冯等人，2018 年；朱等人，2019 年）。 但是句子级 RE 模型在实践中面临不可避免的限制，其中许多现实世界的关系事实只能跨句子提取。 因此，许多研究人员逐渐将注意力转移到文档级关系提取上。
 
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/b35d161a9a6df59dc34edc8b878522fbea77f5f2/NLP/%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/%E5%A4%8D%E6%9D%82%E8%AF%AD%E5%A2%83%E4%B8%8B%E7%9A%84%E5%AE%9E%E4%BD%93%E5%85%B3%E7%B3%BB%E6%8A%BD%E5%8F%96/4.%E6%96%87%E6%A1%A3%E6%8A%BD%E5%8F%96/Double%20Graph/figure/figure_3.png)
+
+图 3：我们提出的 GAIN 和基线模型的案例研究。 模型以文档为输入，以不同颜色预测不同实体之间的关系。 由于篇幅限制，我们只展示了文档中的部分实体和相应的句子。
+
+几种方法（Quirk 和 Poon，2017；Peng 等人，2017 年；Gupta 等人，2019 年；Song 等人，2018 年；Jia 等人，2019 年）利用依赖图来更好地捕获特定于文档的特征，但它们 忽略文档中无处不在的关系推理。 最近，提出了许多模型来解决这个问题。 唐等人。  (2020) 通过考虑来自实体级、句子级和文档级的信息，提出了一种分层推理网络。 然而，它基于层次网络隐式地进行关系推理，而我们采用路径推理机制，这是一种更显式的方式。
+
+(Christopoulou et al., 2019) 是最近文档级 RE 任务中最强大的系统之一。 与 (Christopoulou et al., 2019) 和其他基于图的关系提取方法相比，我们的架构具有许多不同的设计，背后有着不同的动机。首先，图构建的方式不同。 我们创建了两个不同级别的独立图来分别捕获长距离文档感知交互和实体路径推理信息。 而 Christopoulou 等人。  (2019) 将提及和实体放在同一个图中。 此外，他们没有像 GCN 那样进行图节点表示学习来聚合构建图上的交互信息，仅使用 BiLSTM 的特征来表示节点。其次，路径推理的过程不同。 克里斯托普卢等人。  (2019) 使用基于步行的方法为每个实体对迭代生成路径，这需要额外的超参数调整开销来控制推理过程。 相反，我们使用一种注意力机制来选择性地融合实体对的所有可能路径信息，同时没有额外的开销。
+
+当我们写这篇论文时，（Nan 等人，2020 年）将他们的工作作为预印本公开，它采用依赖树来捕获文档中的语义信息。 他们将提及节点和实体节点放在同一个图中，并通过使用 GCN 进行隐式推理。 与他们的工作不同，我们的 GAIN 在不同的图中呈现了提及节点和实体节点，以更好地进行句间信息聚合并更明确地推断关系。
+
+其他一些尝试（Verga 等人，2018 年；Sahu 等人，2019 年；Christopoulou 等人，2019 年）研究特定领域中的文档级 RE，如生物医学 RE。 然而，他们使用的数据集通常包含非常有限的关系类型和实体类型。 例如，CDR (Li et al., 2016) 只有一种类型的关系和两种类型的实体，这可能不是关系推理的理想测试平台。
 
 ## 6 总结
+
+提取句间关系和进行关系推理在文档级关系提取中具有挑战性。
+
+在本文中，我们引入了图聚合和推理网络（GAIN）来更好地应对文档级关系提取，它具有不同粒度的双图。GAIN 利用异构的提及级图来模拟文档中不同提及之间的交互并捕获文档感知特征。 它还使用具有建议路径推理机制的实体级图来更明确地推断关系。
+
+在大规模人工标注数据集 DocRED 上的实验结果表明，GAIN 优于以前的方法，尤其是在句子和推理关系场景中。 消融研究还证实了我们模型中不同模块的有效性。
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
