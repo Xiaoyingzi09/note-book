@@ -12,5 +12,7 @@
     - DOM
     - BOM
 - NLP
+  - NLP_tutorial
   - Bert
   - 关系抽取
+
