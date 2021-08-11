@@ -111,27 +111,27 @@
 
 **基于频域的图形过滤器** 基于光谱的图过滤器的典型示例是图卷积网络 (GCN)（Kipf 和 Welling，2016 年）。 图上的谱卷积定义为信号 xi ∈ Rn（节点 vi 的标量）与傅立叶域中由 θ ∈ Rn 参数化的滤波器 ffilter = diag(θ) 的乘法：
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_3.png)
 
 其中 U 是归一化图拉普拉斯算子 L = In −D− 1 2 AD− 1 2 的特征向量矩阵。  In 是单位矩阵，D 是度矩阵，Λ 是 L 的特征值。
 
 然而，完整特征分解的计算非常昂贵。 为了解决这个问题，Defferrard 等人。  (2016) 使用切比雪夫多项式 Tp(x) 到 P 阶的截断扩展来近似 gθ(Λ)。 等式 (3) 可以表示为：
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_4.png)
 
 其中 ~L = 2 λmax L − In。  λmax 是 L 的最大特征值。θ′ k ∈ RP 是切比雪夫系数的向量。  Chebyshev 多项式可以递归定义：Tk(xi) = 2xiTk−1(xi) − Tk−2(xi)，其中 T0(xi) = 1 和 T1(xi) = xi。 等式（4）是拉普拉斯算子中的第 K 阶多项式，它表明每个中心节点仅依赖于 P 跳范围内的节点。
 
 因此，基于图卷积的神经网络模型可以使用方程（1）来堆叠多个卷积层。  (4). 通过将逐层卷积操作限制为 P = 1 并堆叠多个卷积层，Kipf 和 Welling (2016) 提出了多层图卷积网络 (GCN)。 它进一步逼近 λmax ≈ 2 和方程。  (4) 简化为：
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_5.png)
 
 有两个自由参数 θ′ 0 和 θ′ 1 。为了缓解过拟合问题并最小化操作次数（如矩阵乘法），通过设置单个参数 θ = θ′ 0 来约束参数数量是有益的 = -θ′ 1：
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_6.png)
 
 重复应用此算子可能会导致数值不稳定和爆炸/消失梯度，Kipf 和 Welling (2016) 提出使用重整化技巧：In + D− 1 2 AD− 1 2 → ˜D− 1 2 ˜A ˜D− 1  2 ，其中 ˜A = A + In 且 ˜Dii = � j ˜Aij。 最后，该定义可以用具有 d 个输入通道（即每个节点的 d 维特征向量）和 F 个滤波器或特征映射的信号 H ∈ Rn×d 概括如下：
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_7.png)
 
 这里，W(l-1) 是特定层的可训练权重矩阵，σ(·) 表示激活函数。H(l) ∈ Rn×d 是第 (l − 1) 层的激活节点嵌入。
 
@@ -139,35 +139,35 @@
 
 MPNN (Gilmer et al., 2017) 提出了一个基于空间的图过滤器 ffilter 的通用框架，它是一个由 fU 和 fM 组成的复合函数。 它将图卷积视为一种消息传递过程，其中信息可以直接沿着边从一个节点传递到另一个节点。  MPNN 运行 K 步消息传递迭代，让信息进一步传播到 Khop 相邻节点。 目标节点 vi 上的消息传递函数，即基于空间的图过滤器定义为
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_8.png)
 
 其中 h(0) i = xi，fU(·) 和 fM(·) 分别是具有可学习参数的更新和消息聚合函数。 在导出每个节点的隐藏表示后，可以将 h(L) i（L 是图卷积层的数量）传递给输出层以执行节点级预测任务或传递给读出函数以执行图级预测任务 .  MPNN 非常通用，可以通过应用 fU(·) 和 fM(·) 的不同函数来包含许多现有的 GNN。
 
 考虑到一个节点的邻居数量可以从一个到一千个甚至更多，在具有数百万个节点的巨图中获取节点邻域的完整大小是低效的。  GraphSage (Hamilton et al., 2017a) 采用采样为每个节点获取固定数量的邻居作为
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_9.png)
 
 其中 N(vi) 是节点 vi 的相邻节点的随机样本。 聚合函数可以是对节点排序的排列不变的任何函数，例如均值、总和或最大值操作。
 
 **基于注意力的图过滤器** 原始版本的 GNN 将输入图的边连接视为固定的，并且在图学习过程中不会动态调整连接信息。 受上述观察的启发，并受到多头注意力机制在 Transformer 模型（Vaswani 等人，2017 年；Velickovic 等人，2018 年）中的成功应用的启发，通过引入多头注意力网络（GAT）提出了 GNN 架构的头部注意力机制能够在执行消息传递时动态学习边缘的权重（即注意力分数）。 更具体地说，当为图中的每个目标节点聚合来自相邻节点的嵌入时，多头注意力机制将考虑目标节点与每个相邻节点之间的语义相似性，并且重要的相邻节点将被分配更高的注意力分数，当 执行邻域聚合。 对于第 l 层，GAT 因此使用以下注意力机制的公式，
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_10.png)
 
 其中⃗u(l)和⃗W(l)分别是第l层的权重向量和权重矩阵，|| 是向量连接操作。 请注意，N(vi) 是 vi 的 1 跳邻域，包括其自身。 在获得每对节点 vi 和 vj 的注意力分数 αij 后，更新的节点嵌入可以计算为输入节点特征的线性组合，后跟一些非线性σ，公式为：
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_11.png)
 
 为了稳定上述self-attention的学习过程，受到Vaswani等人的启发。(2017)，采用了多个独立的自注意力机制，并将它们的输出连接起来以产生以下节点嵌入：
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_12.png)
 
 而最终的 GAT 层（即具有 L 层的 GNN 的第 L 层）采用平均而不是串联来组合多头注意力输出。
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_13.png)
 
 **基于循环的图过滤器**基于循环的图过滤器的典型示例是门控图神经网络 (GGNN) 过滤器。 从典型的 GNN 到 GGNN 的最大改进是使用了门控循环单元 (GRU)（Cho 等人，2014）。  GGNN 滤波器还考虑了边缘类型和边缘方向。 为此，ei,j 表示从节点vi 到节点vj 的有向边，ei,j 的边类型为ti,j。  GGNN中基于循环的滤波器ffilter的传播过程可以总结如下：
 
-![]()
+![](https://gitee.com/Xiaoyingzi09/note-book/raw/master/NLP/Graph&NLP/%E7%BB%BC%E8%BF%B0/figure/formula_14.png)
 
 其中 A ∈ Rdn×2dn 是一个矩阵，确定图中的节点如何相互通信。  n 是图中的节点数。  Ai：∈Rd×2d 是节点vi对应的A中的两列块。 在方程式中。  （14），初始节点特征 xi 用额外的零填充，使输入大小等于隐藏大小。 等式 (15) 计算 a(l) i ∈ R2d，方法是通过传入和传出边聚合来自不同节点的信息，参数取决于边类型和方向。 接下来的步骤使用 GRU 单元通过合并 a(l) i 和前一个时间步隐藏状态 h(l−1) i 来更新节点 v 的隐藏状态。
 
